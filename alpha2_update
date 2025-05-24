@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# File path
+MENU_FILE="/usr/local/sbin/menu"
+
+# Create backup
+cp "$MENU_FILE" "$MENU_FILE.bak"
+
+# 1. FIRST remove any existing VPN menu entries (clean slate)
+sed -i '/MENU VPN/d' "$MENU_FILE"
+sed -i '/13 | 013)/,/;;/d' "$MENU_FILE"
+
+# 2. Insert VPN menu in EXACT position - AFTER Trojan, BEFORE border
+sed -i '/echo -e "           ${z}$NC \[${r}04${NC}\]$green MENU TROJAN$NC/{
+a\
+echo -e "            ${z}$NC [${r}13${NC}]$green MENU VPN$NC  ${z}$NC [${r}14${NC}]$green Clear Chace$NC "
+}' "$MENU_FILE"
+
+# 3. Add case handler in CORRECT position - AFTER option 8
+sed -i '/^8 | 08)/,/;;/ {
+  /;;/ a\
+\
+13 | 013)\
+clear\
+vpn\
+;;
+}' "$MENU_FILE"
+
+sed -i '/^13 | 013)/,/;;/ {
+  /;;/ a\
+\
+14 | 014)\
+clear\
+clearcache\
+;;
+}' "$MENU_FILE"
+
+# 4. Fix any potential formatting issues
+
+sed -i 's/╭════════════════╮╭══════════════════╮╭════════════════════╮/╭════════════════╮╭══════════════════╮╭════════════════════╮/' "$MENU_FILE"
+sed -i 's/╰════════════════╯╰══════════════════╯╰════════════════════╯/╰════════════════╯╰══════════════════╯╰════════════════════╯/' "$MENU_FILE"
+
+echo "Update selesai"
